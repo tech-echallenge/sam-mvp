@@ -13,69 +13,119 @@ This document explains how to use the text decomposition and synthesis applicati
    - Create a `.env` file in the project root
    - Add your API key: `OPENAI_API_KEY=your_api_key_here`
 
-## Basic Usage
+## Quick Start Guide
 
-### Processing Text Files
+The simplest way to use this tool is with the provided run script:
 
-To extract text from a plain text file:
+```bash
+./run.sh data/short_sample.txt
+```
+
+This single command will:
+- Process the document using AI
+- Generate a synthesized summary
+- Create a visual comparison
+- Save everything to a timestamped project folder
+- Open the comparison in your browser
+
+You can also specify a custom project name:
+
+```bash
+./run.sh data/short_sample.txt "My Analysis Project"
+```
+
+## Manual Operation
+
+### Text Extraction
+
+To extract text from a file without processing:
 
 ```bash
 python main.py path/to/your/file.txt
 ```
 
-This will display a summary of the document, including:
-- Document title
-- Source path
-- Number of paragraphs
-- Total character count
+This displays basic information about the document without AI processing.
 
-### Generating JSON Output
+### AI Processing
 
-To output the document structure as JSON:
-
-```bash
-python main.py path/to/your/file.txt --format json
-```
-
-### Saving Results to a File
-
-To save the output to a file:
-
-```bash
-python main.py path/to/your/file.txt --format json --output result.json
-```
-
-## AI Processing
-
-To analyze the document structure and generate gists using AI:
+To process the document with AI to identify structure and generate gists:
 
 ```bash
 python main.py path/to/your/file.txt --process
 ```
 
-This will:
-1. Extract text from the file
-2. Use OpenAI to analyze each paragraph
-3. Determine structural tags (THESIS, POINT, EXAMPLE, CONCLUSION)
-4. Identify argument roles (SUPPORTING, COUNTERPOINT, ELABORATION)
-5. Generate concise gists of each paragraph
-6. Display statistics about the document structure
+This analyzes the document, identifying:
+- Structural elements (thesis, points, examples, conclusion)
+- Argument roles (supporting, counterpoints, elaborations)
+- Gists for each paragraph
+- Image tags for visualization
 
-### Combining Options
+### Synthesis Generation
 
-You can combine the AI processing with other options:
+To generate a summarized version of the document:
 
 ```bash
-python main.py path/to/your/file.txt --process --format json --output analyzed_document.json
+python main.py path/to/your/file.txt --process --synthesize
 ```
 
-This will process the document with AI and save the results as JSON.
+This creates a coherent summary from the processed document structure.
 
-## Caution
+### Saving Results
 
-AI processing consumes API credits with OpenAI. Each paragraph requires a separate API call, so processing large documents can use a significant number of tokens.
+You can save the results to specific files:
 
-To minimize costs:
-- Be selective about which documents you process with AI
-- Consider processing only portions of very large documents
-- Adjust the paragraph gisting to only process significant paragraphs
+```bash
+python main.py path/to/your/file.txt --process --synthesize \
+  --output processed.json \
+  --summary-file summary.txt \
+  --comparison comparison.html
+```
+
+Or use automatic output organization:
+
+```bash
+python main.py path/to/your/file.txt --process --synthesize --auto-output
+```
+
+### Opening Results in Browser
+
+To automatically open the comparison view in your browser:
+
+```bash
+python main.py path/to/your/file.txt --process --synthesize --auto-output --open-browser
+```
+
+## Output Files
+
+The processing generates several output files:
+
+1. **processed_document.json**
+   - Complete analysis of the document
+   - Includes all paragraphs with structural tags and gists
+   - Contains image tags for visualization
+
+2. **summary.txt**
+   - Synthesized summary of the document
+   - Maintains the key points in a readable format
+   - Significantly shorter than the original
+
+3. **comparison.html**
+   - Side-by-side view of original document and summary
+   - Toggle between comparison view and JSON debug data
+   - Dark mode interface for comfortable reading
+   - Statistics about word count and reduction percentage
+
+## Project Organization
+
+When using `--auto-output`, the tool creates a structured output directory:
+
+```
+output/
+└── project_name_20250404_123456/
+    ├── short_sample.txt      # Copy of input file
+    ├── processed_document.json
+    ├── summary.txt
+    └── comparison.html
+```
+
+This organization keeps all related outputs together and allows you to process multiple documents without overwriting previous results.

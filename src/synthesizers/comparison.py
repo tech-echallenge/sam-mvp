@@ -24,34 +24,35 @@ def _split_into_sections(text: str) -> List[Tuple[str, str]]:
     """
     # Look for patterns like "## Section Name" or "Section Name\n--"
     section_pattern = r'(?:^|\n)(?:#{1,6}\s+([^\n]+)|([^\n]+)\n[-=]+)'
-    
+
     # Find all section headers
     matches = list(re.finditer(section_pattern, text))
     sections = []
-    
+
     # Process each section
     for i, match in enumerate(matches):
         # Get the section title (from either capture group)
         title = match.group(1) if match.group(1) else match.group(2)
-        
+
         # Get the start of the section content
         start = match.end()
-        
+
         # Get the end of the section (start of next section or end of text)
-        end = matches[i+1].start() if i < len(matches) - 1 else len(text)
-        
+        end = matches[i + 1].start() if i < len(matches) - 1 else len(text)
+
         # Get the section content
         content = text[start:end].strip()
-        
+
         sections.append((title, content))
-    
+
     # If no sections found or first section doesn't start at beginning,
     # add an "Introduction" section for the initial content
     if not sections or matches[0].start() > 0:
-        intro_content = text[:matches[0].start()].strip() if matches else text.strip()
+        intro_content = text[:matches[0].start()].strip(
+        ) if matches else text.strip()
         if intro_content:
             sections.insert(0, ("Introduction", intro_content))
-            
+
     return sections
 
 
@@ -68,42 +69,50 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
     """
     # Get the original text
     original_text = "\n\n".join(p.text for p in document.paragraphs)
-    
+
     # Split both texts into sections
     original_sections = _split_into_sections(original_text)
     synthesis_sections = _split_into_sections(synthesis)
-    
+
     # Prepare JSON for debugging view
     import json
     doc_dict = {
-        "metadata": document.metadata,
-        "paragraphs": [
-            {
-                "id": p.id,
-                "text": p.text,
-                "structural_tag": p.structural_tag.name,
-                "argument_role": p.argument_role.name,
-                "gist": p.gist,
-                "word_count": len(p.text.split()),
-                "gist_sentences": [
-                    {
-                        "text": s.text,
-                        "image_tag": s.image_tag
-                    } for s in p.gist_sentences
-                ] if hasattr(p, 'gist_sentences') else []
-            } for p in document.paragraphs
-        ],
-        "synthesis": synthesis
+        "metadata":
+        document.metadata,
+        "paragraphs": [{
+            "id":
+            p.id,
+            "text":
+            p.text,
+            "structural_tag":
+            p.structural_tag.name,
+            "argument_role":
+            p.argument_role.name,
+            "gist":
+            p.gist,
+            "word_count":
+            len(p.text.split()),
+            "gist_sentences": [{
+                "text": s.text,
+                "image_tag": s.image_tag
+            }
+                               for s in p.gist_sentences] if hasattr(
+                                   p, 'gist_sentences') else []
+        } for p in document.paragraphs],
+        "synthesis":
+        synthesis
     }
     json_data = json.dumps(doc_dict, indent=2)
-    
+
     # Calculate statistics
     original_words = len(original_text.split())
     synthesis_words = len(synthesis.split())
-    reduction_pct = round((1 - synthesis_words / original_words) * 100, 1) if original_words > 0 else 0
-    
+    reduction_pct = round((1 - synthesis_words / original_words) *
+                          100, 1) if original_words > 0 else 0
+
     # Start building HTML with Tailwind CSS
-    html_parts = ["""
+    html_parts = [
+        """
     <!DOCTYPE html>
     <html lang="en" class="dark">
     <head>
@@ -177,25 +186,31 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <h2 class="text-xl font-semibold text-white mb-2">Document Info</h2>
-                        <p class="text-gray-300"><span class="font-medium text-gray-200">Title:</span> """ + html.escape(document.metadata.get('title', 'Untitled')) + """</p>
-                        <p class="text-gray-300"><span class="font-medium text-gray-200">Source:</span> """ + html.escape(document.metadata.get('source_path', 'Unknown')) + """</p>
+                        <p class="text-gray-300"><span class="font-medium text-gray-200">Title:</span> """
+        + html.escape(document.metadata.get('title', 'Untitled')) + """</p>
+                        <p class="text-gray-300"><span class="font-medium text-gray-200">Source:</span> """
+        + html.escape(document.metadata.get('source_path', 'Unknown')) +
+        """</p>
                     </div>
                     <div>
                         <h2 class="text-xl font-semibold text-white mb-2">Statistics</h2>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="bg-gray-700 rounded p-3">
                                 <p class="text-sm text-gray-300">Original</p>
-                                <p class="text-xl font-bold text-white">""" + str(original_words) + """</p>
+                                <p class="text-xl font-bold text-white">""" +
+        str(original_words) + """</p>
                                 <p class="text-xs text-gray-400">words</p>
                             </div>
                             <div class="bg-gray-700 rounded p-3">
                                 <p class="text-sm text-gray-300">Summary</p>
-                                <p class="text-xl font-bold text-white">""" + str(synthesis_words) + """</p>
+                                <p class="text-xl font-bold text-white">""" +
+        str(synthesis_words) + """</p>
                                 <p class="text-xs text-gray-400">words</p>
                             </div>
                             <div class="bg-indigo-800 rounded p-3">
                                 <p class="text-sm text-gray-300">Reduction</p>
-                                <p class="text-xl font-bold text-white">""" + str(reduction_pct) + """%</p>
+                                <p class="text-xl font-bold text-white">""" +
+        str(reduction_pct) + """%</p>
                                 <p class="text-xs text-gray-400">saved</p>
                             </div>
                         </div>
@@ -211,15 +226,20 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
                         <h2 class="text-xl font-bold text-white">Original Document</h2>
                     </div>
                     <div class="p-5 overflow-y-auto" style="max-height: 70vh;">
-    """]
-    
+    """
+    ]
+
     # Add original sections
     for title, content in original_sections:
         html_parts.append(f'<div class="mb-8 pb-6 border-b border-gray-700">')
-        html_parts.append(f'<h3 class="text-lg font-semibold text-blue-400 mb-3">{html.escape(title)}</h3>')
-        html_parts.append(f'<div class="text-gray-300 whitespace-pre-line">{html.escape(content)}</div>')
+        html_parts.append(
+            f'<h3 class="text-lg font-semibold text-blue-400 mb-3">{html.escape(title)}</h3>'
+        )
+        html_parts.append(
+            f'<div class="text-gray-300 whitespace-pre-line">{html.escape(content)}</div>'
+        )
         html_parts.append(f'</div>')
-    
+
     # Add divider and start synthesis column
     html_parts.append("""
                     </div>
@@ -232,14 +252,18 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
                     </div>
                     <div class="p-5 overflow-y-auto" style="max-height: 70vh;">
     """)
-    
+
     # Add synthesis sections
     for title, content in synthesis_sections:
         html_parts.append(f'<div class="mb-8 pb-6 border-b border-gray-700">')
-        html_parts.append(f'<h3 class="text-lg font-semibold text-green-400 mb-3">{html.escape(title)}</h3>')
-        html_parts.append(f'<div class="text-gray-300 whitespace-pre-line">{html.escape(content)}</div>')
+        html_parts.append(
+            f'<h3 class="text-lg font-semibold text-green-400 mb-3">{html.escape(title)}</h3>'
+        )
+        html_parts.append(
+            f'<div class="text-gray-300 whitespace-pre-line">{html.escape(content)}</div>'
+        )
         html_parts.append(f'</div>')
-    
+
     # Add JSON view (hidden by default)
     html_parts.append("""
                     </div>
@@ -253,13 +277,14 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
                         <h2 class="text-xl font-bold text-white">JSON Data</h2>
                     </div>
                     <div class="p-5 overflow-y-auto" style="max-height: 80vh;">
-                        <pre class="json">""" + html.escape(json_data) + """</pre>
+                        <pre class="json">""" + html.escape(json_data) +
+                      """</pre>
                     </div>
                 </div>
             </div>
         </div>
         
-        <footer class="bg-gray-800 py-4 mt-10">
+        <footer class="bg-gray-800 py-4 w-full mt-auto">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <p class="text-center text-gray-400 text-sm">
                     Generated with Document Synthesis Tool
@@ -269,11 +294,12 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
     </body>
     </html>
     """)
-    
+
     return "\n".join(html_parts)
 
 
-def save_comparison(document: Document, synthesis: str, output_path: str) -> None:
+def save_comparison(document: Document, synthesis: str,
+                    output_path: str) -> None:
     """
     Generate and save an HTML comparison between original text and summary.
     
@@ -283,10 +309,10 @@ def save_comparison(document: Document, synthesis: str, output_path: str) -> Non
         output_path: Path where to save the HTML file
     """
     html_content = create_comparison_html(document, synthesis)
-    
+
     # Ensure directory exists
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    
+
     # Save HTML file
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_content)

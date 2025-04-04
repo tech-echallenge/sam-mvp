@@ -5,6 +5,8 @@ import argparse
 import sys
 import json
 import os
+import datetime
+import pathlib
 from dotenv import load_dotenv
 
 from src.extractors.text_extractor import TextExtractor
@@ -14,6 +16,38 @@ from src.synthesizers.comparison import save_comparison
 
 # Load environment variables
 load_dotenv()
+
+
+def create_output_directory(input_file_path, project_name=None):
+    """
+    Create an output directory for the project.
+    
+    Args:
+        input_file_path: Path to the input file
+        project_name: Optional project name, defaults to input file name
+        
+    Returns:
+        str: Path to the output directory
+    """
+    # Get base output directory
+    base_output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+    
+    # Create base output directory if it doesn't exist
+    os.makedirs(base_output_dir, exist_ok=True)
+    
+    # Determine project name
+    if not project_name:
+        # Use input filename without extension as project name
+        project_name = os.path.splitext(os.path.basename(input_file_path))[0]
+    
+    # Add timestamp to create unique directory
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = os.path.join(base_output_dir, f"{project_name}_{timestamp}")
+    
+    # Create the output directory
+    os.makedirs(output_dir, exist_ok=True)
+    
+    return output_dir
 
 
 def main():
@@ -56,10 +90,47 @@ def main():
         help="Path to save HTML comparison between original and summary",
         default=None
     )
+    parser.add_argument(
+        "--project",
+        help="Project name for output directory",
+        default=None
+    )
+    parser.add_argument(
+        "--auto-output",
+        action="store_true",
+        help="Automatically generate all output files in a project directory"
+    )
+    parser.add_argument(
+        "--open-browser",
+        action="store_true",
+        help="Open the comparison HTML in the default browser after processing"
+    )
     
     args = parser.parse_args()
     
     try:
+        # Create output directory if auto-output is enabled
+        output_dir = None
+        output_paths = {}
+        
+        if args.auto_output:
+            output_dir = create_output_directory(args.file_path, args.project)
+            print(f"Created output directory: {output_dir}")
+            
+            # Set automatic output paths
+            output_paths = {
+                "json": os.path.join(output_dir, "processed_document.json"),
+                "summary": os.path.join(output_dir, "summary.txt"),
+                "comparison": os.path.join(output_dir, "comparison.html")
+            }
+            
+            # Create a copy of the input file in the output directory
+            input_filename = os.path.basename(args.file_path)
+            pathlib.Path(os.path.join(output_dir, input_filename)).write_bytes(
+                pathlib.Path(args.file_path).read_bytes()
+            )
+            print(f"Copied input file to output directory")
+        
         # Extract text from the file
         document = TextExtractor.extract_from_file(args.file_path)
         
@@ -93,16 +164,31 @@ def main():
                     
                 print("Synthesis complete")
                 
-                # Save to file if specified
-                if args.summary_file:
-                    with open(args.summary_file, 'w', encoding='utf-8') as f:
-                        f.write(synthesis_result)
-                    print(f"Summary saved to {args.summary_file}")
+                # Determine summary output path
+                summary_path = args.summary_file
+                if not summary_path and args.auto_output:
+                    summary_path = output_paths["summary"]
                 
-                # Generate HTML comparison if requested
-                if args.comparison:
-                    save_comparison(document, synthesis_result, args.comparison)
-                    print(f"Comparison saved to {args.comparison}")
+                # Save summary if path is specified
+                if summary_path:
+                    with open(summary_path, 'w', encoding='utf-8') as f:
+                        f.write(synthesis_result)
+                    print(f"Summary saved to {summary_path}")
+                
+                # Determine comparison output path
+                comparison_path = args.comparison
+                if not comparison_path and args.auto_output:
+                    comparison_path = output_paths["comparison"]
+                
+                # Generate HTML comparison if requested or auto-output
+                if comparison_path:
+                    save_comparison(document, synthesis_result, comparison_path)
+                    print(f"Comparison saved to {comparison_path}")
+                    
+                    # Open browser if requested
+                    if args.open_browser:
+                        import webbrowser
+                        webbrowser.open(f"file://{os.path.abspath(comparison_path)}")
                     
             except Exception as e:
                 print(f"Error during synthesis: {str(e)}", file=sys.stderr)
@@ -174,11 +260,16 @@ def main():
             if synthesis_result:
                 doc_dict["synthesis"] = synthesis_result
             
+            # Determine JSON output path
+            json_path = args.output
+            if not json_path and args.auto_output:
+                json_path = output_paths["json"]
+            
             # Save to file or print to stdout
-            if args.output:
-                with open(args.output, 'w', encoding='utf-8') as f:
+            if json_path:
+                with open(json_path, 'w', encoding='utf-8') as f:
                     json.dump(doc_dict, f, indent=2)
-                print(f"Document structure saved to {args.output}")
+                print(f"Document structure saved to {json_path}")
             else:
                 print(json.dumps(doc_dict, indent=2))
                 
