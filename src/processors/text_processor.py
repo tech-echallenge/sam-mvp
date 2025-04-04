@@ -119,6 +119,18 @@ class TextProcessor:
            - ELABORATION: Explains or adds detail to a previous point
         
         3. Create a concise 1-2 sentence gist of this paragraph that captures its core meaning.
+           IMPORTANT: Express the gist directly as a statement, not as a description of the paragraph.
+           - DO NOT start with phrases like "This paragraph discusses..." or "This section describes..."
+           - DO write in the same style and voice as the original text
+           - Express the core meaning directly as if it were a shorter version of the paragraph itself
+        
+        Examples of good gists:
+        - "Digital literacy provides economic advantages through increased earning potential and career mobility."
+        - "Educational institutions must integrate technology across all subjects rather than teaching it separately."
+        
+        Examples of bad gists:
+        - "This paragraph discusses the benefits of digital literacy in employment."
+        - "The author describes how educational institutions should approach digital literacy."
         
         Respond in JSON format:
         {{
