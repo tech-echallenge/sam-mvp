@@ -25,8 +25,14 @@ pip install -r requirements.txt
 # Process a PDF document
 python -m src.main path/to/document.pdf
 
+# Run visual demo with data structure output
+python -m src.demo path/to/document.pdf
+
 # Run tests
-pytest
+PYTHONPATH=. pytest
+
+# Run a specific test
+PYTHONPATH=. pytest tests/test_pdf_extractor.py
 ```
 
 ## Structure

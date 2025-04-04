@@ -1,0 +1,1 @@
+"""First principles text decomposition and synthesis package."""
