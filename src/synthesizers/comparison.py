@@ -172,8 +172,8 @@ def create_comparison_html(document: Document, synthesis: str) -> str:
             }
         </script>
     </head>
-    <body class="bg-gray-900 text-gray-100 min-h-screen">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-3xl font-bold text-white">Document Comparison</h1>
                 <button id="toggle-btn" onclick="toggleView()" class="btn btn-secondary">
