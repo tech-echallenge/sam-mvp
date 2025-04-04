@@ -31,6 +31,13 @@ class Sentence:
 
 
 @dataclass
+class GistSentence:
+    """Represents a single sentence from a gist with its image tag."""
+    text: str
+    image_tag: str = ""
+
+
+@dataclass
 class Paragraph:
     """Represents a paragraph with its metadata."""
     id: str
@@ -38,6 +45,7 @@ class Paragraph:
     structural_tag: StructuralTag = StructuralTag.UNKNOWN
     argument_role: ArgumentRole = ArgumentRole.UNKNOWN
     gist: str = ""
+    gist_sentences: List[GistSentence] = field(default_factory=list)
 
 
 @dataclass

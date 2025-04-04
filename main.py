@@ -77,14 +77,19 @@ def main():
                 for tag, count in tag_counts.items():
                     print(f"  {tag}: {count} paragraphs")
                     
-                # Show a sample gist
+                # Show a sample gist with sentences and image tags
                 for p in document.paragraphs:
-                    if p.gist:
+                    if p.gist and p.gist_sentences:
                         print("\nSample Gist:")
                         print(f"  Paragraph: {p.id}")
                         print(f"  Structural Tag: {p.structural_tag.name}")
                         print(f"  Argument Role: {p.argument_role.name}")
-                        print(f"  Gist: {p.gist}")
+                        print(f"  Complete Gist: {p.gist}")
+                        
+                        print("\n  Gist Sentences with Image Tags:")
+                        for i, sentence in enumerate(p.gist_sentences, 1):
+                            print(f"  {i}. \"{sentence.text}\"")
+                            print(f"     Image: {sentence.image_tag}")
                         break
             
         elif args.format == "json":
@@ -99,7 +104,14 @@ def main():
                         "argument_role": p.argument_role.name,
                         "gist": p.gist,
                         # Add word count as additional metadata
-                        "word_count": len(p.text.split())
+                        "word_count": len(p.text.split()),
+                        # Add gist sentences with image tags
+                        "gist_sentences": [
+                            {
+                                "text": s.text,
+                                "image_tag": s.image_tag
+                            } for s in p.gist_sentences
+                        ]
                     } for p in document.paragraphs
                 ]
             }

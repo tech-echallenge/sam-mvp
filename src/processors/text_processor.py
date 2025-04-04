@@ -11,7 +11,8 @@ import time
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from src.models.document import Document, Paragraph, StructuralTag, ArgumentRole
+from src.models.document import Document, Paragraph, GistSentence, StructuralTag, ArgumentRole
+from src.utils.text_utils import split_into_sentences
 
 # Load environment variables from .env file
 load_dotenv()
@@ -65,7 +66,7 @@ class TextProcessor:
             position_context = self._get_position_context(i, len(document.paragraphs))
             
             # Get AI analysis for the paragraph
-            structural_tag, argument_role, gist = self._analyze_paragraph(
+            structural_tag, argument_role, gist, gist_sentences = self._analyze_paragraph(
                 paragraph.text, 
                 position_context,
                 document.metadata.get('title', '')
@@ -75,6 +76,7 @@ class TextProcessor:
             paragraph.structural_tag = structural_tag
             paragraph.argument_role = argument_role
             paragraph.gist = gist
+            paragraph.gist_sentences = gist_sentences
             
             # Add a small delay to avoid rate limits with the API
             time.sleep(0.5)
@@ -99,6 +101,10 @@ class TextProcessor:
                 - ArgumentRole: The argument role of the paragraph
                 - str: A concise gist of the paragraph's content
         """
+        # Calculate word count and determine maximum gist length
+        word_count = len(text.split())
+        max_sentences = max(1, word_count // 50)  # 1 sentence per 50 words, minimum 1 sentence
+        
         # Construct a prompt for the AI
         prompt = f"""
         Analyze the following paragraph from a document titled "{document_title}".
@@ -118,19 +124,19 @@ class TextProcessor:
            - COUNTERPOINT: Presents an opposing view or limitation
            - ELABORATION: Explains or adds detail to a previous point
         
-        3. Create a concise 1-2 sentence gist of this paragraph that captures its core meaning.
-           IMPORTANT: Express the gist directly as a statement, not as a description of the paragraph.
+        3. Create a concise gist of this paragraph that captures its core meaning.
+           IMPORTANT:
+           - The paragraph has {word_count} words, so your gist should be at most {max_sentences} sentence(s)
+           - Express the gist directly as a statement, not as a description of the paragraph
            - DO NOT start with phrases like "This paragraph discusses..." or "This section describes..."
            - DO write in the same style and voice as the original text
            - Express the core meaning directly as if it were a shorter version of the paragraph itself
+           - Ensure the gist is grammatically complete
+           - If multiple sentences are needed, make sure each is a complete, grammatical sentence
         
         Examples of good gists:
         - "Digital literacy provides economic advantages through increased earning potential and career mobility."
         - "Educational institutions must integrate technology across all subjects rather than teaching it separately."
-        
-        Examples of bad gists:
-        - "This paragraph discusses the benefits of digital literacy in employment."
-        - "The author describes how educational institutions should approach digital literacy."
         
         Respond in JSON format:
         {{
@@ -173,12 +179,72 @@ class TextProcessor:
             argument_role = ArgumentRole[result["argument_role"]]
             gist = result["gist"]
             
-            return structural_tag, argument_role, gist
+            # Process gist sentences - ALWAYS split ourselves for consistency
+            gist_sentences = []
+            
+            # Split the gist into sentences using our utility
+            sentences = split_into_sentences(gist)
+            
+            # Generate image tags for each sentence
+            for sentence in sentences:
+                # For each sentence, we'll generate an image tag
+                image_tag = self._generate_image_tag(sentence)
+                gist_sentences.append(
+                    GistSentence(
+                        text=sentence,
+                        image_tag=image_tag
+                    )
+                )
+            
+            return structural_tag, argument_role, gist, gist_sentences
             
         except Exception as e:
             # In case of error, return defaults with error message
             print(f"Error processing paragraph: {str(e)}")
-            return StructuralTag.UNKNOWN, ArgumentRole.UNKNOWN, f"Error: {str(e)}"
+            return StructuralTag.UNKNOWN, ArgumentRole.UNKNOWN, f"Error: {str(e)}", []
+            
+    def _generate_image_tag(self, sentence: str) -> str:
+        """
+        Generate an image tag for a single sentence.
+        
+        Args:
+            sentence: The sentence to generate an image tag for
+            
+        Returns:
+            str: A brief description for visualizing the sentence
+        """
+        try:
+            # Create a prompt for generating an image tag
+            prompt = f"""
+            Create a brief visual description (5-10 words) for an image that would illustrate the following sentence:
+            
+            "{sentence}"
+            
+            The description should be:
+            - Visual and concrete (something that could be drawn or photographed)
+            - Representative of the key concept
+            - Brief and focused
+            
+            Respond with just the image description, nothing else.
+            """
+            
+            # Make the API call
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that creates concise visual descriptions."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=50,
+                temperature=0.7
+            )
+            
+            # Return the image tag
+            return response.choices[0].message.content.strip().strip('"\'')
+            
+        except Exception as e:
+            print(f"Error generating image tag: {str(e)}")
+            return "Error generating image"
     
     def _get_position_context(self, index: int, total_paragraphs: int) -> str:
         """
