@@ -6,7 +6,7 @@ A tool that decomposes text into fundamental components and synthesizes them int
 
 1. **Decompose** text into paragraphs and sentences
 2. **Extract** core meanings and image concepts
-3. **Reconstruct** as a simplified argument structure 
+3. **Reconstruct** as a simplified argument structure
 4. **Generate** concise summaries and visual aids
 
 ## Setup
@@ -24,15 +24,6 @@ pip install -r requirements.txt
 ```bash
 # Process a PDF document
 python -m src.main path/to/document.pdf
-
-# Run visual demo with data structure output
-python -m src.demo path/to/document.pdf
-
-# Run tests
-PYTHONPATH=. pytest
-
-# Run a specific test
-PYTHONPATH=. pytest tests/test_pdf_extractor.py
 ```
 
 ## Structure
@@ -45,6 +36,7 @@ PYTHONPATH=. pytest tests/test_pdf_extractor.py
 ## Documentation
 
 See the `docs/` directory for detailed information on:
+
 - [Core Concept](docs/concept.md)
 - [Data Structure](docs/data-structure.md)
 - [Implementation Plan](docs/implementation-plan.md)

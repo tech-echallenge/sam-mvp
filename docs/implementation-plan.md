@@ -7,7 +7,7 @@ sam-mvp/
 ├── data/               # Sample documents and testing data
 ├── docs/               # Project documentation
 ├── src/                # Source code
-│   ├── extractors/     # Modules for text extraction (PDF, HTML, etc.)
+│   ├── extractors/     # Modules for text extraction (text only for now)
 │   ├── analyzers/      # Text analysis and decomposition modules
 │   ├── processors/     # AI processing modules
 │   ├── synthesizers/   # Summary generation and reconstruction
@@ -20,21 +20,23 @@ sam-mvp/
 ## Core Modules
 
 ### 1. Document Extractors
-- PDF extraction (using PyPDF2 or pdfminer)
-- HTML/website extraction
+
 - Plain text handling
 
 ### 2. Structure Analyzers
+
 - Paragraph identification and segmentation
 - Section recognition (abstract, conclusion, etc.)
 - Structural tagging (thesis, point, example, conclusion)
 
 ### 3. AI Processors
+
 - Sentence gist extraction
 - Image tag generation
 - Argument role classification
 
 ### 4. Knowledge Synthesizers
+
 - Argument tree construction
 - Summary generation
 - Visual element integration
@@ -42,6 +44,7 @@ sam-mvp/
 ## AI Integration
 
 We'll use Large Language Models (LLMs) for:
+
 - Extracting the gist of sentences
 - Generating appropriate image tags
 - Classifying paragraph roles in the overall argument

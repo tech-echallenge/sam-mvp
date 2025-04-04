@@ -1,0 +1,1 @@
+"""Extractors package for handling different document formats."""
