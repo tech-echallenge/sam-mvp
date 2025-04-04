@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 
 from src.extractors.text_extractor import TextExtractor
 from src.processors.text_processor import TextProcessor
+from src.synthesizers.basic_synthesis import generate_transcript, refine_transcript
+from src.synthesizers.comparison import save_comparison
 
 # Load environment variables
 load_dotenv()
@@ -39,6 +41,21 @@ def main():
         action="store_true",
         help="Process document with AI to analyze structure and generate gists"
     )
+    parser.add_argument(
+        "--synthesize",
+        action="store_true",
+        help="Generate a synthesized summary from the processed document"
+    )
+    parser.add_argument(
+        "--summary-file",
+        help="Path to save the synthesized summary",
+        default=None
+    )
+    parser.add_argument(
+        "--comparison",
+        help="Path to save HTML comparison between original and summary",
+        default=None
+    )
     
     args = parser.parse_args()
     
@@ -47,6 +64,7 @@ def main():
         document = TextExtractor.extract_from_file(args.file_path)
         
         # Process with AI if requested
+        processor = None
         if args.process:
             try:
                 print("Processing document with AI... (this may take a while)")
@@ -57,6 +75,37 @@ def main():
                 print(f"Error during AI processing: {str(e)}", file=sys.stderr)
                 if not args.output:  # Only exit if not saving output
                     sys.exit(1)
+                    
+        # Generate synthesis if requested
+        synthesis_result = None
+        if args.synthesize and args.process:  # Only synthesize if we've processed
+            try:
+                print("Generating synthesis...")
+                
+                # First generate the programmatic transcript
+                transcript = generate_transcript(document)
+                
+                # Then refine it with AI if we have a processor available
+                if processor:
+                    synthesis_result = refine_transcript(transcript, processor.client)
+                else:
+                    synthesis_result = transcript
+                    
+                print("Synthesis complete")
+                
+                # Save to file if specified
+                if args.summary_file:
+                    with open(args.summary_file, 'w', encoding='utf-8') as f:
+                        f.write(synthesis_result)
+                    print(f"Summary saved to {args.summary_file}")
+                
+                # Generate HTML comparison if requested
+                if args.comparison:
+                    save_comparison(document, synthesis_result, args.comparison)
+                    print(f"Comparison saved to {args.comparison}")
+                    
+            except Exception as e:
+                print(f"Error during synthesis: {str(e)}", file=sys.stderr)
         
         # Display information about the document
         if args.format == "summary":
@@ -92,6 +141,11 @@ def main():
                             print(f"     Image: {sentence.image_tag}")
                         break
             
+            # Display synthesis if available
+            if synthesis_result:
+                print("\n\n--- Synthesized Summary ---\n")
+                print(synthesis_result)
+            
         elif args.format == "json":
             # Convert document to JSON
             doc_dict = {
@@ -115,6 +169,10 @@ def main():
                     } for p in document.paragraphs
                 ]
             }
+            
+            # Add synthesis to JSON if available
+            if synthesis_result:
+                doc_dict["synthesis"] = synthesis_result
             
             # Save to file or print to stdout
             if args.output:

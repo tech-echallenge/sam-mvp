@@ -1,0 +1,302 @@
+
+    <!DOCTYPE html>
+    <html lang="en" class="dark">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document Comparison</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#3b82f6',
+                            secondary: '#10b981',
+                            dark: {
+                                100: '#374151',
+                                200: '#1f2937',
+                                300: '#111827',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <style type="text/tailwind">
+            @layer components {
+                .btn {
+                    @apply px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors;
+                }
+                .btn-primary {
+                    @apply bg-primary text-white hover:bg-blue-600 focus:ring-blue-500;
+                }
+                .btn-secondary {
+                    @apply bg-gray-700 text-white hover:bg-gray-800 focus:ring-gray-600;
+                }
+                pre.json {
+                    @apply p-4 rounded-lg bg-gray-800 text-gray-100 overflow-x-auto text-sm;
+                }
+            }
+        </style>
+        <script>
+            function toggleView() {
+                const comparisonView = document.getElementById('comparison-view');
+                const jsonView = document.getElementById('json-view');
+                const toggleBtn = document.getElementById('toggle-btn');
+                
+                if (comparisonView.classList.contains('hidden')) {
+                    comparisonView.classList.remove('hidden');
+                    jsonView.classList.add('hidden');
+                    toggleBtn.textContent = 'View JSON';
+                } else {
+                    comparisonView.classList.add('hidden');
+                    jsonView.classList.remove('hidden');
+                    toggleBtn.textContent = 'View Comparison';
+                }
+            }
+        </script>
+    </head>
+    <body class="bg-gray-900 text-gray-100 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-white">Document Comparison</h1>
+                <button id="toggle-btn" onclick="toggleView()" class="btn btn-secondary">
+                    View JSON
+                </button>
+            </div>
+            
+            <!-- Metadata Card -->
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white mb-2">Document Info</h2>
+                        <p class="text-gray-300"><span class="font-medium text-gray-200">Title:</span> The Importance of Digital Literacy</p>
+                        <p class="text-gray-300"><span class="font-medium text-gray-200">Source:</span> data/short_sample.txt</p>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-white mb-2">Statistics</h2>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-gray-700 rounded p-3">
+                                <p class="text-sm text-gray-300">Original</p>
+                                <p class="text-xl font-bold text-white">390</p>
+                                <p class="text-xs text-gray-400">words</p>
+                            </div>
+                            <div class="bg-gray-700 rounded p-3">
+                                <p class="text-sm text-gray-300">Summary</p>
+                                <p class="text-xl font-bold text-white">158</p>
+                                <p class="text-xs text-gray-400">words</p>
+                            </div>
+                            <div class="bg-indigo-800 rounded p-3">
+                                <p class="text-sm text-gray-300">Reduction</p>
+                                <p class="text-xl font-bold text-white">59.5%</p>
+                                <p class="text-xs text-gray-400">saved</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison View -->
+            <div id="comparison-view" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Original Document Column -->
+                <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-gray-700 p-4 border-b border-gray-600">
+                        <h2 class="text-xl font-bold text-white">Original Document</h2>
+                    </div>
+                    <div class="p-5 overflow-y-auto" style="max-height: 70vh;">
+    
+<div class="mb-8 pb-6 border-b border-gray-700">
+<h3 class="text-lg font-semibold text-blue-400 mb-3">Introduction</h3>
+<div class="text-gray-300 whitespace-pre-line">The Importance of Digital Literacy
+
+Abstract
+Digital literacy is increasingly essential in modern society, affecting employment opportunities, civic participation, and daily activities. This paper examines how digital skills impact individual success and argues that comprehensive digital education should be prioritized at all educational levels.
+
+Introduction
+In today&#x27;s interconnected world, digital technologies permeate nearly every aspect of life. From job applications to banking, healthcare management to communication, digital interfaces have become unavoidable. However, a significant portion of the population lacks the skills needed to effectively navigate these digital environments, creating a widening gap between the digitally literate and those left behind.
+
+Current State of Digital Literacy
+Recent surveys indicate that approximately 30% of adults worldwide have minimal or no digital skills. This deficiency extends beyond elderly populations, affecting individuals across various age groups and socioeconomic backgrounds. Even among younger &quot;digital natives,&quot; there exists a surprising lack of advanced digital competencies beyond social media and basic application usage.
+
+Benefits of Digital Literacy
+Digital literacy provides numerous advantages in personal and professional contexts. In employment settings, digitally skilled workers earn 20% more on average than their less-skilled counterparts. These individuals also demonstrate greater career mobility and adaptability during economic shifts. Furthermore, digital literacy enables more effective citizenship, allowing individuals to access government services, verify information sources, and participate in civic discourse through digital channels.
+
+Challenges to Digital Inclusion
+Despite its importance, multiple barriers prevent universal digital literacy. Economic factors limit device and internet access, particularly in lower-income communities. Educational systems often lack sufficient resources for technology integration. Additionally, psychological barriers exist among certain populations who feel intimidated by or resistant to new technologies.
+
+Recommendations
+Educational institutions should incorporate digital literacy across curricula rather than treating it as a separate subject. Public libraries and community centers can serve as accessible digital training hubs. Government initiatives should focus on both infrastructure development and skills training programs for underserved communities. Furthermore, senior-focused programs should address the specific needs and concerns of older adults.
+
+Conclusion
+As society becomes increasingly digitized, ensuring universal digital literacy represents an essential educational and social justice initiative. By removing barriers to digital participation and implementing comprehensive educational approaches, we can minimize the digital divide and create more equitable access to the opportunities afforded by technology. Failing to address this need will only exacerbate existing social inequalities and leave vulnerable populations further disadvantaged.</div>
+</div>
+
+                    </div>
+                </div>
+                
+                <!-- Synthesized Summary Column -->
+                <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-gray-700 p-4 border-b border-gray-600">
+                        <h2 class="text-xl font-bold text-white">Synthesized Summary</h2>
+                    </div>
+                    <div class="p-5 overflow-y-auto" style="max-height: 70vh;">
+    
+<div class="mb-8 pb-6 border-b border-gray-700">
+<h3 class="text-lg font-semibold text-green-400 mb-3">Introduction</h3>
+<div class="text-gray-300 whitespace-pre-line">Digital literacy is essential for success in today&#x27;s society. Surprisingly, about 30% of adults worldwide lack the necessary digital skills, impacting people of all ages and backgrounds. It&#x27;s not just about using computers; digital literacy has tangible benefits like increased earnings, career flexibility, and improved civic engagement.
+
+However, achieving universal digital literacy faces challenges. Economic factors, educational resource limitations, and psychological barriers all play a role in hindering widespread digital literacy. To bridge this gap, it&#x27;s crucial to integrate digital literacy into education curricula, offer training in public spaces, focus on infrastructure and skills training for underserved communities, and cater to the specific needs of older adults.
+
+By addressing these issues, we can reduce the digital divide and ensure equitable access to technology for all. This is vital for preventing further social inequalities and fostering a more inclusive society. Universal digital literacy is not just a nice-to-have; it&#x27;s a necessity for building a more connected and empowered world.</div>
+</div>
+
+                    </div>
+                </div>
+            </div>
+            
+            <!-- JSON Debug View (Hidden by Default) -->
+            <div id="json-view" class="hidden">
+                <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-gray-700 p-4 border-b border-gray-600">
+                        <h2 class="text-xl font-bold text-white">JSON Data</h2>
+                    </div>
+                    <div class="p-5 overflow-y-auto" style="max-height: 80vh;">
+                        <pre class="json">{
+  &quot;metadata&quot;: {
+    &quot;source_path&quot;: &quot;data/short_sample.txt&quot;,
+    &quot;filename&quot;: &quot;short_sample.txt&quot;,
+    &quot;title&quot;: &quot;The Importance of Digital Literacy&quot;
+  },
+  &quot;paragraphs&quot;: [
+    {
+      &quot;id&quot;: &quot;p-1&quot;,
+      &quot;text&quot;: &quot;The Importance of Digital Literacy&quot;,
+      &quot;structural_tag&quot;: &quot;THESIS&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Digital literacy is important.&quot;,
+      &quot;word_count&quot;: 5,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Digital literacy is important.&quot;,
+          &quot;image_tag&quot;: &quot;Person using laptop with books and lightbulb icons.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-2&quot;,
+      &quot;text&quot;: &quot;Abstract\nDigital literacy is increasingly essential in modern society, affecting employment opportunities, civic participation, and daily activities. This paper examines how digital skills impact individual success and argues that comprehensive digital education should be prioritized at all educational levels.&quot;,
+      &quot;structural_tag&quot;: &quot;THESIS&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Comprehensive digital education is crucial for individual success in modern society.&quot;,
+      &quot;word_count&quot;: 39,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Comprehensive digital education is crucial for individual success in modern society.&quot;,
+          &quot;image_tag&quot;: &quot;Digital classroom with diverse students engaged in learning.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-3&quot;,
+      &quot;text&quot;: &quot;Introduction\nIn today&#x27;s interconnected world, digital technologies permeate nearly every aspect of life. From job applications to banking, healthcare management to communication, digital interfaces have become unavoidable. However, a significant portion of the population lacks the skills needed to effectively navigate these digital environments, creating a widening gap between the digitally literate and those left behind.&quot;,
+      &quot;structural_tag&quot;: &quot;THESIS&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Digital literacy is crucial in bridging the gap between the digitally literate and those left behind in today&#x27;s tech-driven world.&quot;,
+      &quot;word_count&quot;: 56,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Digital literacy is crucial in bridging the gap between the digitally literate and those left behind in today&#x27;s tech-driven world.&quot;,
+          &quot;image_tag&quot;: &quot;Two people on a bridge, one using a laptop.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-4&quot;,
+      &quot;text&quot;: &quot;Current State of Digital Literacy\nRecent surveys indicate that approximately 30% of adults worldwide have minimal or no digital skills. This deficiency extends beyond elderly populations, affecting individuals across various age groups and socioeconomic backgrounds. Even among younger \&quot;digital natives,\&quot; there exists a surprising lack of advanced digital competencies beyond social media and basic application usage.&quot;,
+      &quot;structural_tag&quot;: &quot;POINT&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Approximately 30% of adults worldwide lack digital skills, impacting various age groups and socioeconomic backgrounds.&quot;,
+      &quot;word_count&quot;: 56,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Approximately 30% of adults worldwide lack digital skills, impacting various age groups and socioeconomic backgrounds.&quot;,
+          &quot;image_tag&quot;: &quot;Diverse group struggling to use digital devices.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-5&quot;,
+      &quot;text&quot;: &quot;Benefits of Digital Literacy\nDigital literacy provides numerous advantages in personal and professional contexts. In employment settings, digitally skilled workers earn 20% more on average than their less-skilled counterparts. These individuals also demonstrate greater career mobility and adaptability during economic shifts. Furthermore, digital literacy enables more effective citizenship, allowing individuals to access government services, verify information sources, and participate in civic discourse through digital channels.&quot;,
+      &quot;structural_tag&quot;: &quot;POINT&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Digital literacy offers benefits such as higher earnings, career flexibility, and enhanced civic engagement.&quot;,
+      &quot;word_count&quot;: 65,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Digital literacy offers benefits such as higher earnings, career flexibility, and enhanced civic engagement.&quot;,
+          &quot;image_tag&quot;: &quot;Computer with money, career symbols, and community icons.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-6&quot;,
+      &quot;text&quot;: &quot;Challenges to Digital Inclusion\nDespite its importance, multiple barriers prevent universal digital literacy. Economic factors limit device and internet access, particularly in lower-income communities. Educational systems often lack sufficient resources for technology integration. Additionally, psychological barriers exist among certain populations who feel intimidated by or resistant to new technologies.&quot;,
+      &quot;structural_tag&quot;: &quot;POINT&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Economic factors, lack of resources in education, and psychological barriers hinder universal digital literacy.&quot;,
+      &quot;word_count&quot;: 49,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Economic factors, lack of resources in education, and psychological barriers hinder universal digital literacy.&quot;,
+          &quot;image_tag&quot;: &quot;Diverse group struggling to climb a digital literacy wall.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-7&quot;,
+      &quot;text&quot;: &quot;Recommendations\nEducational institutions should incorporate digital literacy across curricula rather than treating it as a separate subject. Public libraries and community centers can serve as accessible digital training hubs. Government initiatives should focus on both infrastructure development and skills training programs for underserved communities. Furthermore, senior-focused programs should address the specific needs and concerns of older adults.&quot;,
+      &quot;structural_tag&quot;: &quot;CONCLUSION&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Recommendations for integrating digital literacy include incorporating it across curricula, utilizing public spaces for training, focusing on infrastructure and skills training for underserved communities, and addressing the specific needs of older adults.&quot;,
+      &quot;word_count&quot;: 57,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Recommendations for integrating digital literacy include incorporating it across curricula, utilizing public spaces for training, focusing on infrastructure and skills training for underserved communities, and addressing the specific needs of older adults.&quot;,
+          &quot;image_tag&quot;: &quot;Digital literacy workshops in community centers for all ages.&quot;
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: &quot;p-8&quot;,
+      &quot;text&quot;: &quot;Conclusion\nAs society becomes increasingly digitized, ensuring universal digital literacy represents an essential educational and social justice initiative. By removing barriers to digital participation and implementing comprehensive educational approaches, we can minimize the digital divide and create more equitable access to the opportunities afforded by technology. Failing to address this need will only exacerbate existing social inequalities and leave vulnerable populations further disadvantaged.&quot;,
+      &quot;structural_tag&quot;: &quot;CONCLUSION&quot;,
+      &quot;argument_role&quot;: &quot;SUPPORTING&quot;,
+      &quot;gist&quot;: &quot;Universal digital literacy is crucial for reducing the digital divide and promoting equitable access to technology, addressing this need is essential to prevent further social inequalities.&quot;,
+      &quot;word_count&quot;: 63,
+      &quot;gist_sentences&quot;: [
+        {
+          &quot;text&quot;: &quot;Universal digital literacy is crucial for reducing the digital divide and promoting equitable access to technology, addressing this need is essential to prevent further social inequalities.&quot;,
+          &quot;image_tag&quot;: &quot;Diverse group accessing computers in a library setting.&quot;
+        }
+      ]
+    }
+  ],
+  &quot;synthesis&quot;: &quot;Digital literacy is essential for success in today&#x27;s society. Surprisingly, about 30% of adults worldwide lack the necessary digital skills, impacting people of all ages and backgrounds. It&#x27;s not just about using computers; digital literacy has tangible benefits like increased earnings, career flexibility, and improved civic engagement.\n\nHowever, achieving universal digital literacy faces challenges. Economic factors, educational resource limitations, and psychological barriers all play a role in hindering widespread digital literacy. To bridge this gap, it&#x27;s crucial to integrate digital literacy into education curricula, offer training in public spaces, focus on infrastructure and skills training for underserved communities, and cater to the specific needs of older adults.\n\nBy addressing these issues, we can reduce the digital divide and ensure equitable access to technology for all. This is vital for preventing further social inequalities and fostering a more inclusive society. Universal digital literacy is not just a nice-to-have; it&#x27;s a necessity for building a more connected and empowered world.&quot;
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="bg-gray-800 py-4 mt-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-gray-400 text-sm">
+                    Generated with Document Synthesis Tool
+                </p>
+            </div>
+        </footer>
+    </body>
+    </html>
+    
